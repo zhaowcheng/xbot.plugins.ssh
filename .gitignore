@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE config files
+.vscode/*
+.idea/*
+
+# setuptools
+build/
+*.egg-info/
+
+# build
+dist/
+
+# venv
+venv/
+
+# testproj
+testproj/
