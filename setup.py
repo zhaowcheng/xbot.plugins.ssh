@@ -29,7 +29,7 @@ def find_long_description():
 setup(
     name='xbot.plugins.ssh',
     version=find_version(),
-    description='SSH library for xbot.',
+    description='SSH library for xbot.framework',
     long_description=find_long_description(),
     long_description_content_type='text/x-rst',
     author='zhaowcheng',

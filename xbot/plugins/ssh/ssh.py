@@ -234,7 +234,7 @@ class SSHConnection(object):
         """
         if self._cwd:
             cmd = f'cd {self._cwd} && {cmd}'
-        extra = {}
+        extra = {'hook': {}}
         self._logger.info(f"Command: '{cmd}', Expect: '{expect}'", extra=extra)
         envs = self._shenvs.copy()
         envs.update(shenvs)
@@ -262,10 +262,10 @@ class SSHConnection(object):
                     prompts.pop(written)
         else:
             result = SSHCommandResult(output, rc=-1)
-            extra['hook'] = {'more': result}
+            extra['hook']['more'] = result
             raise TimeoutError(f"Command '{cmd}' timedout({timeout}s):\n{result}")
         result = SSHCommandResult(output, rc=stdout.channel.recv_exit_status(), cmd=cmd)
-        extra['hook'] = {'more': result}
+        extra['hook']['more'] = result
         if expect != None:
             if (isinstance(expect, int) and expect != result.rc) or \
                     (isinstance(expect, str) and expect not in result):

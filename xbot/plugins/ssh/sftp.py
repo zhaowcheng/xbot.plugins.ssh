@@ -63,9 +63,9 @@ class SFTPConnection(object):
         >>> getfile('/tmp/myfile', '/home', 'newfile')  # /home/newfile
         """
         ldir = os.path.join(ldir, '')
-        self._logger.info(f'Getting file {ldir} <= {rfile}')
         filename = filename or self.basename(rfile)
         lfile = os.path.join(ldir, filename)
+        self._logger.info(f'Getting file {lfile} <= {rfile}')
         self._sftpclient.get(rfile, lfile)
 
     def putfile(self, lfile: str, rdir: str, filename: str = None) -> None:
@@ -81,9 +81,9 @@ class SFTPConnection(object):
         >>> putfile('/home/myfile', '/tmp', 'newfile')  # /tmp/newfile
         """
         rdir = self.join(rdir, '')
-        self._logger.info(f'Putting file {lfile} => {rdir}')
         filename = filename or os.path.basename(lfile)
         rfile = self.join(rdir, filename)
+        self._logger.info(f'Putting file {lfile} => {rfile}')
         self._sftpclient.put(lfile, rfile)
             
     def getdir(self, rdir: str, ldir: str) -> None:

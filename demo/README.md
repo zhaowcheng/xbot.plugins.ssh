@@ -1,0 +1,1 @@
+This is a project to show how to use `xbot.plugins.ssh`. To run it, you should modify the information(`ip`, `user`, and `password`) in `testbeds/mytestbed.yml` to you own. Then, you can type `xbot run -b testbeds/mytestbed.yml -s testsets/mytestset.yml` command to run it.

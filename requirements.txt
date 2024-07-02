@@ -1,2 +1,2 @@
-xbot.framework >= 0.2.0; python_version >= '3.6'
+xbot.framework >= 0.4.0; python_version >= '3.6'
 paramiko; python_version >= '3.6'
