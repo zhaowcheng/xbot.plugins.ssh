@@ -1,0 +1,10 @@
+host:
+  ip: 192.168.8.8
+  sshport: 22
+  users: 
+    - role: admin
+      name: root
+      password: root
+    - role: normal
+      name: xbot
+      password: xbot

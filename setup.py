@@ -22,8 +22,15 @@ def find_requires():
     
 
 def find_long_description():
-    with open('README.rst', encoding='utf8') as f:
-        return f.read()
+    desc = ''
+    for readme in ('README.md', 'README.zh.md'):
+        if desc:
+            desc += '\n***\n\n'
+        with open(readme, encoding='utf8') as f:
+            desc += ''.join(f.readlines()[7:])
+    desc = desc.replace('/tree/master/',
+                        f'/tree/v{find_version()}/')
+    return desc
 
 
 setup(
@@ -31,7 +38,7 @@ setup(
     version=find_version(),
     description='SSH library for xbot.framework',
     long_description=find_long_description(),
-    long_description_content_type='text/x-rst',
+    long_description_content_type='text/markdown',
     author='zhaowcheng',
     author_email='zhaowcheng@163.com',
     install_requires=find_requires(),

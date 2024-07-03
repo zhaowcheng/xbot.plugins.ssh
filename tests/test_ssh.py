@@ -70,13 +70,16 @@ class TestSSHConnection(unittest.TestCase):
         self.conn.exec("read -p 'input: '", prompts={'input:': 'hello'})
 
     def test_expect_0(self):
-        self.conn.exec('cd /tmp', expect=0)
+        self.conn.exec('ls /tmp', expect=0)
         with self.assertRaises(SSHCommandError):
-            self.conn.exec('cd /errpath', expect=0)
+            self.conn.exec('ls /errpath', expect=0)
+
+    def test_expect_2(self):
+        self.conn.exec('ls /errpath', expect=2)
 
     def test_expect_none(self):
-        self.conn.exec('cd /tmp', expect=None)
-        self.conn.exec('cd /errpath', expect=None)
+        self.conn.exec('ls /tmp', expect=None)
+        self.conn.exec('ls /errpath', expect=None)
 
     def test_expect_str(self):
         self.conn.exec('echo hello', expect='hello')

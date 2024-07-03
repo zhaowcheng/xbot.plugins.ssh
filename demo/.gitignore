@@ -12,8 +12,8 @@ logs/*
 
 # testbeds
 testbeds/*
-!testbeds/testbed_example.yml
+!testbeds/mytestbed.yml
 
 # testsets
 testsets/*
-!testsets/testset_example.yml
+!testsets/mytestset.yml

@@ -39,6 +39,7 @@ class SSHCommandResult(str):
         """
         out = remove_ansi_escape_chars(out)
         out = remove_unprintable_chars(out)
+        out = '\n'.join(out.splitlines())
         o = str.__new__(cls, out.strip())
         o.__rc = rc
         o.__cmd = cmd

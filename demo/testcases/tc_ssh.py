@@ -38,14 +38,20 @@ class tc_ssh(TestCase):
         """
         Execute a command and expect no error.
         """
-        self.ssh.exec('cd /tmp', expect=0)
+        self.ssh.exec('ls /tmp', expect=0)
+
+    def step5(self):
+        """
+        Execute a command and expect return code is 2.
+        """
+        self.ssh.exec('ls /errpath', expect=2)
 
     def step5(self):
         """
         Execute a command and expect nothing.
         """
-        self.ssh.exec('cd /tmp', expect=None)
-        self.ssh.exec('cd /errpath', expect=None)
+        self.ssh.exec('ls /tmp', expect=None)
+        self.ssh.exec('ls /errpath', expect=None)
 
     def step6(self):
         """
