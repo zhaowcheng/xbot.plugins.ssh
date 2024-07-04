@@ -24,8 +24,10 @@ class tc_sftp(TestCase):
         self.lgetdir = os.path.join(self.lhome, 'lgetdir')
         self.rputdir = '/tmp/rputgetdir'
         self.rgetdir = self.rputdir
-        if not self.sftp.exists(self.rputdir):
-            self.sftp.makedirs(self.rputdir)
+        for d in (self.lputdir, self.lgetdir):
+            if os.path.exists(d):
+                shutil.rmtree(d)
+        self.sftp.makedirs(self.rputdir)
         os.makedirs(os.path.join(self.lputdir, 'dir', 'subdir'))
         os.system('whoami > %s' % os.path.join(self.lputdir, 'file'))
         os.system('whoami > %s' % os.path.join(self.lputdir, 'dir', 'subfile'))

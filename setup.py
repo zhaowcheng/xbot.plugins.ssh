@@ -27,7 +27,7 @@ def find_long_description():
         if desc:
             desc += '\n***\n\n'
         with open(readme, encoding='utf8') as f:
-            desc += ''.join(f.readlines()[7:])
+            desc += ''.join(f.readlines()[6:])
     desc = desc.replace('/tree/master/',
                         f'/tree/v{find_version()}/')
     return desc
