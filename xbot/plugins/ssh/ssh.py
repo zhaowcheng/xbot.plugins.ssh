@@ -150,7 +150,7 @@ class SSHConnection(object):
         user: str,
         password: str,
         port: int = 22,
-        timeout: int = 5
+        timeout: int = 10
     ) -> None:
         """
         Open the connection.
