@@ -1,2 +1,0 @@
-xbot.framework; python_version >= '3.6'
-xbot.plugins.ssh; python_version >= '3.6'

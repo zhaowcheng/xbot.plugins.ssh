@@ -8,7 +8,7 @@ import textwrap
 import threading
 import socket
 
-from typing import Generator, Optional, Union
+from typing import Any, Iterator, cast
 from datetime import datetime
 from select import select
 from contextlib import contextmanager
@@ -31,7 +31,12 @@ class SSHCommandResult(str):
     """
     Result of SSH command.
     """
-    def __new__(cls, out: str, rc: int = 0, cmd: str = '') -> str:
+    def __new__(
+        cls: type['SSHCommandResult'],
+        out: str,
+        rc: int = 0,
+        cmd: str = ''
+    ) -> 'SSHCommandResult':
         """
         :param out: output.
         :param rc: return code.
@@ -40,7 +45,7 @@ class SSHCommandResult(str):
         out = remove_ansi_escape_chars(out)
         out = remove_unprintable_chars(out)
         out = '\n'.join(out.splitlines())
-        o = str.__new__(cls, out.strip())
+        o = cast(SSHCommandResult, str.__new__(cls, out.strip()))
         o.__rc = rc
         o.__cmd = cmd
         return o
@@ -61,10 +66,10 @@ class SSHCommandResult(str):
 
     def getfield(
         self,
-        key: str,
+        key: str | int,
         col: int,
-        sep: str = None
-    ) -> Optional[str]:
+        sep: str | None = None
+    ) -> str | None:
         """
         Get a specified field from the output.
 
@@ -98,8 +103,8 @@ class SSHCommandResult(str):
     def getcol(
         self,
         col: int,
-        sep: str = None
-    ) -> list:
+        sep: str | None = None
+    ) -> list[str]:
         """
         Get a specified column from the output.
 
@@ -127,7 +132,7 @@ class SSHConnection(object):
     """
     SSH connection.
     """
-    def __init__(self, shenvs: dict = {}):
+    def __init__(self, shenvs: dict[str, str] = {}) -> None:
         """
         :param shenvs: shell environment variables for method `exec`.
             `LANG` defaults to `en_US.UTF-8`.
@@ -136,11 +141,11 @@ class SSHConnection(object):
         self._logger = ExtraAdapter(logger, {})
         self._sshclient = SSHClient()
         self._sshclient.set_missing_host_key_policy(AutoAddPolicy())
-        self._shenvs = shenvs
+        self._shenvs: dict[str, str] = shenvs
         for k, v in {'LANG': 'en_US.UTF-8',
                      'LANGUAGE': 'en_US.UTF-8'}.items():
             self._shenvs[k] = self._shenvs.get(k, v)
-        self._password = None
+        self._password: str | None = None
         self._cdlock = threading.Lock()
         self._cwd = ''
 
@@ -175,15 +180,15 @@ class SSHConnection(object):
                 f'Authentication failed when SSH connect to {host} with user `{user}`, '
                 f'please check whether the username and password are correct.'
             ) from None
-        except socket.timeout:
-            raise SSHConnectError(
-                f'Timed out when SSH connect to {host}({timeout}s), '
-                'please check whether the network is normal.'
-            ) from None
         except NoValidConnectionsError:
             raise SSHConnectError(
                 f'Could not connect to port {port} on {host}, '
                 'please check whether the port is opened.'
+            ) from None
+        except OSError:
+            raise SSHConnectError(
+                f'Could not connect to {host}, '
+                'please check whether the network is normal.'
             ) from None
         except SSHException as e:
             msg = str(e)
@@ -203,10 +208,10 @@ class SSHConnection(object):
     def exec(
         self,
         cmd: str,
-        expect: Union[int, str, None] = 0,
+        expect: int | str | None = 0,
         timeout: int = 15,
-        prompts: dict = {},
-        shenvs: dict = {}
+        prompts: dict[str, str] = {},
+        shenvs: dict[str, str] = {}
     ) -> SSHCommandResult:
         """
         Execute a command on the SSH server.
@@ -281,15 +286,22 @@ class SSHConnection(object):
                 raise SSHCommandError(msg)
         return result
 
-    def sudo(self, cmd, *args, **kwargs) -> SSHCommandResult:
+    def sudo(
+        self,
+        cmd: str,
+        *args: Any,
+        **kwargs: Any
+    ) -> SSHCommandResult:
         """
         Execute a command with sudo, arguments are same to `exec`.
         """
-        kwargs['prompts'] = {'[sudo] password': self._password}
+        kwargs['prompts'] = {
+            '[sudo] password': cast(str, self._password)
+        }
         return self.exec(f'sudo {cmd}', *args, **kwargs)
 
     @contextmanager
-    def cd(self, path) -> Generator[None, str, None]:
+    def cd(self, path: str) -> Iterator[None]:
         """
         change current directory.
 
@@ -306,4 +318,3 @@ class SSHConnection(object):
         finally:
             self._cwd = ''
             self._cdlock.release()
-

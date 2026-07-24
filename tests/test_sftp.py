@@ -35,10 +35,21 @@ class TestSFTPConnection(unittest.TestCase):
         os.system('whoami > %s' % os.path.join(cls.LPUTDIR, 'dir', 'subfile'))
 
     @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls.LPUTDIR)
-        shutil.rmtree(cls.LGETDIR)
-        cls.sftp.disconnect()
+    def tearDownClass(cls) -> None:
+        try:
+            if cls.sftp.exists(cls.RPUTDIR):
+                for top, _, files in reversed(
+                    list(cls.sftp.walk(cls.RPUTDIR))
+                ):
+                    for filename in files:
+                        cls.sftp._client.remove(
+                            cls.sftp.join(top, filename)
+                        )
+                    cls.sftp._client.rmdir(top)
+        finally:
+            shutil.rmtree(cls.LPUTDIR, ignore_errors=True)
+            shutil.rmtree(cls.LGETDIR, ignore_errors=True)
+            cls.sftp.disconnect()
 
     def test_01_putdir(self):
         l = os.path.join(self.LPUTDIR, 'dir')

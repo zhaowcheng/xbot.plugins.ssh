@@ -7,7 +7,7 @@ SFTP module
 import os
 import stat
 
-from typing import Generator
+from typing import Iterator, cast
 from contextlib import contextmanager
 
 from paramiko import Transport, SFTPClient, SFTPFile
@@ -22,9 +22,13 @@ class SFTPConnection(object):
     """
     SFTP connection.
     """
-    def __init__(self):
-        self._sftpclient = None
+    def __init__(self) -> None:
+        self._sftpclient: SFTPClient | None = None
         self._logger = ExtraAdapter(logger, {})
+
+    @property
+    def _client(self) -> SFTPClient:
+        return cast(SFTPClient, self._sftpclient)
 
     def connect(
         self,
@@ -48,9 +52,14 @@ class SFTPConnection(object):
         """
         Close the connection.
         """
-        self._sftpclient.close()
+        self._client.close()
 
-    def getfile(self, rfile: str, ldir: str, filename: str = None) -> None:
+    def getfile(
+        self,
+        rfile: str,
+        ldir: str,
+        filename: str | None = None
+    ) -> None:
         """
         Get `rfile` from SFTP server into `ldir`.
         
@@ -66,9 +75,14 @@ class SFTPConnection(object):
         filename = filename or self.basename(rfile)
         lfile = os.path.join(ldir, filename)
         self._logger.info(f'Getting file {lfile} <= {rfile}')
-        self._sftpclient.get(rfile, lfile)
+        self._client.get(rfile, lfile)
 
-    def putfile(self, lfile: str, rdir: str, filename: str = None) -> None:
+    def putfile(
+        self,
+        lfile: str,
+        rdir: str,
+        filename: str | None = None
+    ) -> None:
         """
         Put `lfile` into the `rdir` of SFTP server.
 
@@ -84,7 +98,7 @@ class SFTPConnection(object):
         filename = filename or os.path.basename(lfile)
         rfile = self.join(rdir, filename)
         self._logger.info(f'Putting file {lfile} => {rfile}')
-        self._sftpclient.put(lfile, rfile)
+        self._client.put(lfile, rfile)
             
     def getdir(self, rdir: str, ldir: str) -> None:
         """
@@ -107,7 +121,7 @@ class SFTPConnection(object):
             for f in files:
                 r = self.join(top, f)
                 l = os.path.join(ldir, f)
-                self._sftpclient.get(r, l)
+                self._client.get(r, l)
             for d in dirs:
                 l = os.path.join(ldir, d)
                 if not os.path.exists(l):
@@ -134,7 +148,7 @@ class SFTPConnection(object):
             for f in files:
                 l = os.path.join(top, f)
                 r = self.join(rdir, f)
-                self._sftpclient.put(l, r)
+                self._client.put(l, r)
             for d in dirs:
                 r = self.join(rdir, d)
                 if not self.exists(r):
@@ -144,8 +158,8 @@ class SFTPConnection(object):
         """
         Similar to os.path.join().
         """
-        paths = [p.rstrip('/') for p in paths]
-        return '/'.join(paths)
+        normalized_paths = [p.rstrip('/') for p in paths]
+        return '/'.join(normalized_paths)
 
     def normpath(self, path: str) -> str:
         """
@@ -161,22 +175,25 @@ class SFTPConnection(object):
         """
         return path.rsplit('/', 1)[-1]
 
-    def exists(self, path: str) -> str:
+    def exists(self, path: str) -> bool:
         """
         Similar to os.path.exists().
         """
         try:
-            self._sftpclient.stat(path)
+            self._client.stat(path)
             return True
         except FileNotFoundError:
             return False
 
-    def walk(self, path: str):
+    def walk(
+        self,
+        path: str
+    ) -> Iterator[tuple[str, list[str], list[str]]]:
         """
         Similar to os.walk().
         """
         dirs, files =  [], []
-        for a in self._sftpclient.listdir_attr(path):
+        for a in self._client.listdir_attr(path):
             if stat.S_ISDIR(a.st_mode):
                 dirs.append(a.filename)
             else:
@@ -187,7 +204,7 @@ class SFTPConnection(object):
             for w in self.walk(self.join(path, d)):
                 yield w
 
-    def makedirs(self, path: str) -> str:
+    def makedirs(self, path: str) -> None:
         """
         Similar to os.makedirs().
         """
@@ -196,15 +213,19 @@ class SFTPConnection(object):
         for p in path.split('/'):
             curpath = self.join(curpath, p)
             if not self.exists(curpath):
-                self._sftpclient.mkdir(curpath)
+                self._client.mkdir(curpath)
 
     @contextmanager
-    def open(self, filepath: str, mode: str = 'r') -> Generator[SFTPFile, str, None]:
+    def open(
+        self,
+        filepath: str,
+        mode: str = 'r'
+    ) -> Iterator[SFTPFile]:
         """
         Similar to builtin open().
         """
         self._logger.info('Open %s with mode=%s' % (filepath, mode))
-        f = self._sftpclient.open(filepath, mode)
+        f = self._client.open(filepath, mode)
         try:
             yield f
         finally:

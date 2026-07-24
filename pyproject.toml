@@ -1,3 +1,38 @@
 [build-system]
-requires = ["setuptools>=40.6"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "xbot.plugins.ssh"
+version = "0.2.0"
+description = "SSH library for xbot.framework"
+authors = [
+    { name = "zhaowcheng", email = "zhaowcheng@163.com" },
+]
+license = "BSD-2-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = [
+    "xbot.framework>=0.5.0",
+    "paramiko",
+]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dynamic = ["readme"]
+
+[project.urls]
+Homepage = "https://github.com/zhaowcheng/xbot.plugins.ssh"
+Issues = "https://github.com/zhaowcheng/xbot.plugins.ssh/issues"
+
+[tool.setuptools.dynamic]
+
+[tool.setuptools.packages.find]
+include = ["xbot.plugins.ssh*"]
+
+[tool.setuptools.package-data]
+"xbot.plugins.ssh" = ["py.typed"]

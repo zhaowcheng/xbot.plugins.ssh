@@ -56,7 +56,8 @@ class TestSSHConnection(unittest.TestCase):
     def test_connect_error_ip(self):
         conn = SSHConnection()
         with self.assertRaises(SSHConnectError) as cm:
-            conn.connect('128.0.0.1', self.USER, self.PWD, self.PORT)
+            conn.connect('255.255.255.255',
+                         self.USER, self.PWD, self.PORT)
         self.assertIn('please check whether the network is normal',
                       str(cm.exception))
 
