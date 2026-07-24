@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xbot.plugins.ssh"
-version = "0.2.0"
 description = "SSH library for xbot.framework"
 authors = [
     { name = "zhaowcheng", email = "zhaowcheng@163.com" },
@@ -23,13 +22,14 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-dynamic = ["readme"]
+dynamic = ["version", "readme"]
 
 [project.urls]
 Homepage = "https://github.com/zhaowcheng/xbot.plugins.ssh"
 Issues = "https://github.com/zhaowcheng/xbot.plugins.ssh/issues"
 
 [tool.setuptools.dynamic]
+version = { attr = "xbot.plugins.ssh.version.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["xbot.plugins.ssh*"]
