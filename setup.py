@@ -1,21 +1,20 @@
 # Build hook: generate long_description from README files,
 # stripping language-switcher headers.
 # All other metadata lives in pyproject.toml.
-import re
 
 from setuptools import setup
 
 
 def _build_long_description() -> str:
-    desc = ""
+    import re
+    parts = []
     for readme in ("README.md", "README.zh.md"):
-        if desc:
-            desc += "\n***\n\n"
         with open(readme, encoding="utf8") as f:
-            desc += "".join(f.readlines()[6:])
-    with open("pyproject.toml", encoding="utf8") as f:
-        m = re.search(r'''^version\s*=\s*["']([^"']+)''', f.read(), re.M)
-        version = m.group(1) if m else ""
+            parts.append("".join(f.readlines()[6:]))
+    desc = "\n***\n\n".join(parts)
+    with open("xbot/plugins/ssh/version.py", encoding="utf8") as f:
+        m = re.search(r"__version__[^'\"\\]+['\"]([^'\"]+)", f.read())
+        version = m.group(1) if m else "0.2.2"
     desc = desc.replace("/tree/master/", f"/tree/v{version}/")
     return desc
 
