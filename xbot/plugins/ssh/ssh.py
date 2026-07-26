@@ -6,9 +6,8 @@ SSH module.
 
 import textwrap
 import threading
-import socket
 
-from typing import Any, Iterator, cast
+from typing import Any, Generator, cast
 from datetime import datetime
 from select import select
 from contextlib import contextmanager
@@ -301,7 +300,7 @@ class SSHConnection(object):
         return self.exec(f'sudo {cmd}', *args, **kwargs)
 
     @contextmanager
-    def cd(self, path: str) -> Iterator[None]:
+    def cd(self, path: str) -> Generator[None, None, None]:
         """
         change current directory.
 

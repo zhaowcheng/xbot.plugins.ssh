@@ -12,7 +12,7 @@ license = "BSD-2-Clause"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
-    "xbot.framework>=0.5.0",
+    "xbot.framework>=0.5.1",
     "paramiko",
 ]
 classifiers = [
@@ -32,7 +32,7 @@ Issues = "https://github.com/zhaowcheng/xbot.plugins.ssh/issues"
 version = { attr = "xbot.plugins.ssh.version.__version__" }
 
 [tool.setuptools.packages.find]
-include = ["xbot.plugins.ssh*"]
+include = ["xbot.plugins.ssh*", "tests*"]
 
 [tool.setuptools.package-data]
 "xbot.plugins.ssh" = ["py.typed"]
