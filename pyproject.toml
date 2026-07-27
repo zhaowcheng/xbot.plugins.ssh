@@ -12,7 +12,7 @@ license = "BSD-2-Clause"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
-    "xbot.framework>=0.5.2",
+    "xbot.framework",
     "paramiko",
 ]
 classifiers = [
